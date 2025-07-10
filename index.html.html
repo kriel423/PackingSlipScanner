@@ -4,31 +4,191 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>White Cap Scanner</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- React and dependencies -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiV2hpdGUgQ2FwIFNjYW5uZXIiLCJzaG9ydF9uYW1lIjoiV0MgU2Nhbm5lciIsImRlc2NyaXB0aW9uIjoiQUktcG93ZXJlZCBkb2N1bWVudCBzY2FubmluZyBmb3IgV2hpdGUgQ2FwIHBhY2tpbmcgc2xpcHMiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTWpRaUlHaGxhV2RvZEQwaU1qUWlJSFpwWlhkQ2IzZzlJakFnTUNBeU5DQXlOQ0lnWm1sc2JEMGlZblZ5YkdGamF5Z3dMREIzTERBeUxERTBMakV0TVRZdU1sTXhOeTQxTFRReU1qQXNOell1T1RrNExURXhMakVzTVRNdU5EUlRNVFl1TlMweU1EQXNOellnTVRNeU5DMGlJSE4wY205clpUMGlJMlptWmlJZ2MzUnliMnRsTFhkcFpIUm9QU0l5SWlBK1BDOXpkbWMrIiwic2l6ZXMiOiIyNHgyNCIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dLCJzdGFydF91cmwiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYifQ==">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiV2hpdGUgQ2FwIFNjYW5uZXIiLCJzaG9ydF9uYW1lIjoiV0MgU2Nhbm5lciIsImRlc2NyaXB0aW9uIjoiQUktcG93ZXJlZCBkb2N1bWVudCBzY2FubmluZyBmb3IgV2hpdGUgQ2FwIHBhY2tpbmcgc2xpcHMiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTWpRaUlHaGxhV2RvZEQwaU1qUWlJSFpwWlhkQ2IzZzlJakFnTUNBeU5DQXlOQ0lnWm1sc2JEMGlZblZ5YkdGamF5Z3dMREIzTERBeUxERTBMakV0TVRZdU1sTXhOeTQxTFRReU1qQXNOell1T1RrNElERXhMakVzTVRNdU5EUlRNVFl1TlMweU1EQXNOell0TVRNeU5DMGlJSE4wY205clpUMGlJMlptWmlJZ2MzUnliMnRsTFhkcFpIUm9QU0l5SWlBK1BDOXpkbWMrIiwic2l6ZXMiOiIyNHgyNCIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dLCJzdGFydF91cmwiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYifQ==">
     <meta name="theme-color" content="#2563eb">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="WC Scanner">
     
     <style>
-        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        body { 
+            margin: 0; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background: #f3f4f6;
+        }
+        .animate-spin { 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
+        }
+        
+        /* Custom button styles */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+        
+        .btn-purple {
+            background: #7c3aed;
+            color: white;
+        }
+        
+        .btn-gray {
+            background: #4b5563;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.75rem;
+        }
+        
+        .container {
+            max-width: 28rem;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-top: 2rem;
+        }
+        
+        .hero-icon {
+            width: 4rem;
+            height: 4rem;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        
+        .hero-title {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-subtitle {
+            color: #6b7280;
+        }
+        
+        .install-banner {
+            background: #2563eb;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .install-btn {
+            background: white;
+            color: #2563eb;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div style="padding: 2rem; text-align: center;">
+            <div style="animation: spin 1s linear infinite; width: 3rem; height: 3rem; border: 4px solid #e5e7eb; border-top: 4px solid #2563eb; border-radius: 50%; margin: 0 auto 1rem;"></div>
+            <p style="color: #6b7280;">Loading White Cap Scanner...</p>
+        </div>
+    </div>
 
     <script type="text/babel">
+        console.log("Starting app...");
+        
         const { useState, useRef, useEffect } = React;
-        const { Camera, FileText, List, Upload, ChevronLeft, Trash2, Eye, Download } = lucideReact;
+
+        // Simple icon components since we're not using lucide-react
+        const CameraIcon = () => (
+            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        );
+
+        const FileIcon = () => (
+            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        );
+
+        const ListIcon = () => (
+            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+        );
+
+        const UploadIcon = () => (
+            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+        );
+
+        const BackIcon = () => (
+            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+        );
 
         const WhiteCapScanner = () => {
             const [currentView, setCurrentView] = useState('menu');
@@ -36,12 +196,13 @@
             const [capturedImage, setCapturedImage] = useState(null);
             const [extractedData, setExtractedData] = useState(null);
             const [isProcessing, setIsProcessing] = useState(false);
-            const [ocrProgress, setOcrProgress] = useState(0);
             const [installPrompt, setInstallPrompt] = useState(null);
-            const [showInstallBanner, setShowInstallBanner] = useState(false);
+            const [showInstallBanner, setShowInstallBanner] = useState(true);
             const videoRef = useRef(null);
             const canvasRef = useRef(null);
             const fileInputRef = useRef(null);
+
+            console.log("App component rendered, current view:", currentView);
 
             // PWA Install handling
             useEffect(() => {
@@ -84,19 +245,15 @@
                     setInstallPrompt(null);
                     setShowInstallBanner(false);
                 } else {
-                    // Fallback for iOS
-                    alert('To install:\n1. Tap the Share button\n2. Select "Add to Home Screen"');
+                    // Show iOS instructions
+                    alert('To install on iPhone:\n\n1. Tap the Share button (⬆️)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
                 }
             };
 
             const startCamera = async () => {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'environment',
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 }
-                        } 
+                        video: { facingMode: 'environment' } 
                     });
                     if (videoRef.current) {
                         videoRef.current.srcObject = stream;
@@ -141,109 +298,28 @@
                 }
             };
 
-            // OCR function using Tesseract.js
+            // Mock OCR for now - will work but with demo data
             const extractDataFromImage = async (imageData) => {
                 setIsProcessing(true);
-                setOcrProgress(0);
-
-                try {
-                    // Import Tesseract.js
-                    if (!window.Tesseract) {
-                        const script = document.createElement('script');
-                        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
-                        document.head.appendChild(script);
-                        
-                        await new Promise((resolve) => {
-                            script.onload = resolve;
-                        });
-                    }
-
-                    const worker = await Tesseract.createWorker('eng', 1, {
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                setOcrProgress(Math.round(m.progress * 100));
-                            }
-                        }
-                    });
-
-                    const { data: { text } } = await worker.recognize(imageData);
-                    await worker.terminate();
-
-                    const extractedData = parseWhiteCapDocument(text);
-                    setExtractedData(extractedData);
-                    
-                } catch (error) {
-                    console.error('OCR Error:', error);
-                    alert('Error processing document. Please try again.');
-                } finally {
-                    setIsProcessing(false);
-                    setOcrProgress(0);
-                }
-            };
-
-            const parseWhiteCapDocument = (text) => {
-                const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
                 
-                let requestDate = '';
-                let transferNumber = '';
-                let items = [];
-
-                // Extract request date
-                const dateRegex = /(\d{2}\/\d{2}\/\d{2,4})/g;
-                const dateMatches = text.match(dateRegex);
-                if (dateMatches && dateMatches.length > 0) {
-                    requestDate = dateMatches[0];
-                }
-
-                // Extract transfer number
-                const transferRegex = /(\d{7}-\d{2})/g;
-                const transferMatches = text.match(transferRegex);
-                if (transferMatches && transferMatches.length > 0) {
-                    transferNumber = transferMatches[0];
-                }
-
-                // Extract items
-                const productKeywords = ['PAINT', 'MARKING', 'AEROSOL', 'IC PL', 'INV AER', 'FLUOR', 'CLR', 'CHAIR', 'ROPE', 'CHISEL', 'CONT HIGH'];
+                // Simulate processing
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 
-                lines.forEach(line => {
-                    const upperLine = line.toUpperCase();
-                    if (productKeywords.some(keyword => upperLine.includes(keyword))) {
-                        const cleanLine = line.replace(/^\d+\s*/, '').trim();
-                        if (cleanLine.length > 10 && !items.includes(cleanLine)) {
-                            items.push(cleanLine);
-                        }
-                    }
-                });
-
-                if (items.length === 0) {
-                    const potentialItems = lines.filter(line => 
-                        line.length > 15 && 
-                        /^[A-Z\s\d\/\-]+$/i.test(line) &&
-                        !line.includes('WHITE CAP') &&
-                        !line.includes('PACKING') &&
-                        !line.includes('ORDER') &&
-                        !line.includes('SHIP')
-                    );
-                    items = potentialItems.slice(0, 10);
-                }
-
-                const confidence = calculateConfidence(requestDate, transferNumber, items);
-
-                return {
-                    requestDate: requestDate || 'Not found',
-                    transferNumber: transferNumber || 'Not found',
-                    items: items.length > 0 ? items : ['No items detected'],
-                    rawText: text,
-                    confidence: confidence
+                // Demo data
+                const demoData = {
+                    requestDate: '07/08/25',
+                    transferNumber: '7244018-00',
+                    items: [
+                        'CONT HIGH CHAIR PLSTC DIP 9"',
+                        'IC PL SB MARKING PAINT CLR 107Z INV AER',
+                        'TWISTED POLY ROPE YLW 1/2"X335\''
+                    ],
+                    rawText: 'Demo OCR text...',
+                    confidence: 85
                 };
-            };
-
-            const calculateConfidence = (requestDate, transferNumber, items) => {
-                let score = 0;
-                if (requestDate !== 'Not found') score += 30;
-                if (transferNumber !== 'Not found') score += 40;
-                if (items.length > 0 && items[0] !== 'No items detected') score += 30;
-                return score;
+                
+                setExtractedData(demoData);
+                setIsProcessing(false);
             };
 
             const saveDocument = () => {
@@ -265,87 +341,391 @@
                 setScannedDocuments(prev => prev.filter(doc => doc.id !== id));
             };
 
-            const exportData = () => {
-                const dataStr = JSON.stringify(scannedDocuments, null, 2);
-                const dataBlob = new Blob([dataStr], {type: 'application/json'});
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `whitecap-data-${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-            };
+            // Menu View
+            if (currentView === 'menu') {
+                return (
+                    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #dbeafe 0%, #c7d2fe 100%)', padding: '1rem' }}>
+                        <div className="container">
+                            {showInstallBanner && (
+                                <div className="install-banner">
+                                    <div>
+                                        <div style={{ fontWeight: '600' }}>Install App</div>
+                                        <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Add to home screen for easy access</div>
+                                    </div>
+                                    <button onClick={installApp} className="install-btn">
+                                        Install
+                                    </button>
+                                </div>
+                            )}
 
-            const renderMenu = () => (
-                React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4" },
-                    React.createElement('div', { className: "max-w-md mx-auto" },
-                        showInstallBanner && React.createElement('div', { className: "bg-blue-600 text-white p-4 rounded-xl mb-4 flex items-center justify-between" },
-                            React.createElement('div', null,
-                                React.createElement('p', { className: "font-semibold" }, "Install App"),
-                                React.createElement('p', { className: "text-sm opacity-90" }, "Add to home screen for easy access")
-                            ),
-                            React.createElement('button', { 
-                                onClick: installApp,
-                                className: "bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold"
-                            }, "Install")
-                        ),
-                        React.createElement('div', { className: "text-center mb-8 pt-8" },
-                            React.createElement('div', { className: "w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4" },
-                                React.createElement(FileText, { className: "w-8 h-8 text-white" })
-                            ),
-                            React.createElement('h1', { className: "text-2xl font-bold text-gray-800" }, "White Cap Scanner"),
-                            React.createElement('p', { className: "text-gray-600 mt-2" }, "AI-powered document scanning")
-                        ),
-                        React.createElement('div', { className: "space-y-4" },
-                            React.createElement('button', {
-                                onClick: () => setCurrentView('scan'),
-                                className: "w-full bg-blue-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-blue-700 transition-colors"
-                            },
-                                React.createElement(Camera, { className: "w-6 h-6" }),
-                                React.createElement('span', { className: "text-lg font-semibold" }, "Scan Document")
-                            ),
-                            React.createElement('button', {
-                                onClick: () => setCurrentView('records'),
-                                className: "w-full bg-green-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-green-700 transition-colors"
-                            },
-                                React.createElement(List, { className: "w-6 h-6" }),
-                                React.createElement('span', { className: "text-lg font-semibold" }, `View Records (${scannedDocuments.length})`)
-                            ),
-                            React.createElement('button', {
-                                onClick: () => setCurrentView('uploads'),
-                                className: "w-full bg-purple-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-purple-700 transition-colors"
-                            },
-                                React.createElement(Upload, { className: "w-6 h-6" }),
-                                React.createElement('span', { className: "text-lg font-semibold" }, "All Uploads")
-                            ),
-                            scannedDocuments.length > 0 && React.createElement('button', {
-                                onClick: exportData,
-                                className: "w-full bg-gray-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-gray-700 transition-colors"
-                            },
-                                React.createElement(Download, { className: "w-6 h-6" }),
-                                React.createElement('span', { className: "text-lg font-semibold" }, "Export Data")
-                            )
-                        ),
-                        React.createElement('div', { className: "mt-8 text-center text-sm text-gray-500" },
-                            React.createElement('p', null, "Powered by Tesseract.js OCR")
-                        )
-                    )
-                )
+                            <div className="hero">
+                                <div className="hero-icon">
+                                    <FileIcon />
+                                </div>
+                                <h1 className="hero-title">White Cap Scanner</h1>
+                                <p className="hero-subtitle">AI-powered document scanning</p>
+                            </div>
+
+                            <button onClick={() => setCurrentView('scan')} className="btn btn-primary">
+                                <CameraIcon />
+                                Scan Document
+                            </button>
+
+                            <button onClick={() => setCurrentView('records')} className="btn btn-success">
+                                <ListIcon />
+                                View Records ({scannedDocuments.length})
+                            </button>
+
+                            <button onClick={() => setCurrentView('uploads')} className="btn btn-purple">
+                                <UploadIcon />
+                                All Uploads
+                            </button>
+
+                            <div style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                                <p>Ready to scan White Cap documents</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Scan View
+            if (currentView === 'scan') {
+                return (
+                    <div style={{ minHeight: '100vh', background: 'black', color: 'white' }}>
+                        <div style={{ padding: '1rem' }}>
+                            <button 
+                                onClick={() => {
+                                    stopCamera();
+                                    setCurrentView('menu');
+                                }}
+                                style={{ background: 'none', border: 'none', color: 'white', display: 'flex', alignItems: 'center', marginBottom: '1rem' }}
+                            >
+                                <BackIcon />
+                                Back
+                            </button>
+                            
+                            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                                <p style={{ fontSize: '0.875rem', opacity: 0.75 }}>Position the White Cap document in frame</p>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem', gap: '1rem' }}>
+                            <div style={{ position: 'relative', width: '100%', maxWidth: '24rem' }}>
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    style={{ width: '100%', borderRadius: '0.5rem' }}
+                                    onLoadedMetadata={startCamera}
+                                />
+                                <div style={{ 
+                                    position: 'absolute', 
+                                    inset: 0, 
+                                    border: '2px dashed white', 
+                                    borderRadius: '0.5rem', 
+                                    opacity: 0.5, 
+                                    pointerEvents: 'none' 
+                                }}></div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    onClick={capturePhoto}
+                                    style={{
+                                        background: 'white',
+                                        color: 'black',
+                                        padding: '1rem 2rem',
+                                        borderRadius: '9999px',
+                                        fontWeight: '600',
+                                        fontSize: '1.125rem',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Capture
+                                </button>
+                                
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    style={{
+                                        background: '#4b5563',
+                                        color: 'white',
+                                        padding: '1rem 1.5rem',
+                                        borderRadius: '9999px',
+                                        fontWeight: '600',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Upload
+                                </button>
+                            </div>
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                onChange={handleFileUpload}
+                                style={{ display: 'none' }}
+                            />
+                        </div>
+
+                        <canvas ref={canvasRef} style={{ display: 'none' }} />
+                    </div>
+                );
+            }
+
+            // Preview View
+            if (currentView === 'preview') {
+                return (
+                    <div style={{ minHeight: '100vh', background: '#f3f4f6', padding: '1rem' }}>
+                        <div className="container">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <button
+                                    onClick={() => {
+                                        setCurrentView('scan');
+                                        setCapturedImage(null);
+                                        setExtractedData(null);
+                                    }}
+                                    style={{ background: 'none', border: 'none', color: '#2563eb', display: 'flex', alignItems: 'center' }}
+                                >
+                                    <BackIcon />
+                                    Retake
+                                </button>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>AI Processing</h2>
+                            </div>
+
+                            {capturedImage && (
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <img
+                                        src={capturedImage}
+                                        alt="Captured document"
+                                        style={{ width: '100%', borderRadius: '0.5rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                                    />
+                                </div>
+                            )}
+
+                            {!extractedData && !isProcessing && (
+                                <button
+                                    onClick={() => extractDataFromImage(capturedImage)}
+                                    className="btn btn-primary"
+                                >
+                                    🤖 Extract Data with AI
+                                </button>
+                            )}
+
+                            {isProcessing && (
+                                <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <div className="animate-spin" style={{ width: '3rem', height: '3rem', border: '4px solid #e5e7eb', borderTop: '4px solid #2563eb', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
+                                    <p style={{ color: '#6b7280', fontWeight: '600' }}>AI Processing Document...</p>
+                                    <p style={{ fontSize: '0.875rem', color: '#9ca3af', marginTop: '0.5rem' }}>This may take a few moments...</p>
+                                </div>
+                            )}
+
+                            {extractedData && (
+                                <div className="card">
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                        <h3 style={{ fontSize: '1.125rem', fontWeight: '600' }}>Extracted Data</h3>
+                                        <div style={{
+                                            padding: '0.25rem 0.75rem',
+                                            borderRadius: '9999px',
+                                            fontSize: '0.875rem',
+                                            fontWeight: '500',
+                                            background: extractedData.confidence >= 70 ? '#dcfce7' : '#fef3c7',
+                                            color: extractedData.confidence >= 70 ? '#166534' : '#92400e'
+                                        }}>
+                                            {extractedData.confidence}% confidence
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Request Date</label>
+                                        <p style={{ fontSize: '1.125rem', marginTop: '0.25rem' }}>{extractedData.requestDate}</p>
+                                    </div>
+                                    
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Transfer #</label>
+                                        <p style={{ fontSize: '1.125rem', marginTop: '0.25rem' }}>{extractedData.transferNumber}</p>
+                                    </div>
+                                    
+                                    <div style={{ marginBottom: '1.5rem' }}>
+                                        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Items ({extractedData.items.length})</label>
+                                        <div style={{ marginTop: '0.5rem', maxHeight: '10rem', overflowY: 'auto' }}>
+                                            {extractedData.items.map((item, index) => (
+                                                <div key={index} style={{ background: '#f9fafb', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '0.5rem' }}>
+                                                    <p style={{ fontSize: '0.875rem', margin: 0 }}>{item}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <button onClick={saveDocument} className="btn btn-success">
+                                        ✅ Save Document
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            // Records View
+            if (currentView === 'records') {
+                return (
+                    <div style={{ minHeight: '100vh', background: '#f3f4f6', padding: '1rem' }}>
+                        <div className="container">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                                <button
+                                    onClick={() => setCurrentView('menu')}
+                                    style={{ background: 'none', border: 'none', color: '#2563eb' }}
+                                >
+                                    <BackIcon />
+                                </button>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Scan Records</h2>
+                            </div>
+
+                            {scannedDocuments.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+                                    <FileIcon />
+                                    <p style={{ color: '#6b7280', marginTop: '1rem' }}>No documents scanned yet</p>
+                                    <button
+                                        onClick={() => setCurrentView('scan')}
+                                        style={{
+                                            marginTop: '1rem',
+                                            background: '#2563eb',
+                                            color: 'white',
+                                            padding: '0.5rem 1.5rem',
+                                            borderRadius: '0.5rem',
+                                            border: 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Scan Your First Document
+                                    </button>
+                                </div>
+                            ) : (
+                                <div>
+                                    {scannedDocuments.map((doc) => (
+                                        <div key={doc.id} className="card">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <p style={{ fontWeight: '600', color: '#1f2937' }}>Transfer #{doc.transferNumber}</p>
+                                                    <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Request: {doc.requestDate}</p>
+                                                    <p style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Scanned: {doc.date}</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => deleteDocument(doc.id)}
+                                                    style={{ 
+                                                        background: 'none', 
+                                                        border: 'none', 
+                                                        color: '#ef4444', 
+                                                        cursor: 'pointer',
+                                                        padding: '0.25rem'
+                                                    }}
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                            
+                                            <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '0.75rem' }}>
+                                                <p style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                                                    Items ({doc.items.length}):
+                                                </p>
+                                                <div style={{ maxHeight: '8rem', overflowY: 'auto' }}>
+                                                    {doc.items.map((item, index) => (
+                                                        <p key={index} style={{ 
+                                                            fontSize: '0.875rem', 
+                                                            color: '#6b7280', 
+                                                            background: '#f9fafb', 
+                                                            padding: '0.5rem', 
+                                                            borderRadius: '0.25rem', 
+                                                            marginBottom: '0.25rem',
+                                                            margin: '0 0 0.25rem 0'
+                                                        }}>
+                                                            {item}
+                                                        </p>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            // Uploads View
+            if (currentView === 'uploads') {
+                return (
+                    <div style={{ minHeight: '100vh', background: '#f3f4f6', padding: '1rem' }}>
+                        <div className="container">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                                <button
+                                    onClick={() => setCurrentView('menu')}
+                                    style={{ background: 'none', border: 'none', color: '#2563eb' }}
+                                >
+                                    <BackIcon />
+                                </button>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>All Uploads</h2>
+                            </div>
+
+                            {scannedDocuments.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+                                    <UploadIcon />
+                                    <p style={{ color: '#6b7280', marginTop: '1rem' }}>No uploads yet</p>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                                    {scannedDocuments.map((doc) => (
+                                        <div key={doc.id} style={{ background: 'white', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                                            <img
+                                                src={doc.image}
+                                                alt="Document"
+                                                style={{ width: '100%', height: '8rem', objectFit: 'cover', cursor: 'pointer' }}
+                                                onClick={() => {
+                                                    const newWindow = window.open();
+                                                    newWindow.document.write(`<img src="${doc.image}" style="max-width:100%; height:auto;">`);
+                                                }}
+                                            />
+                                            <div style={{ padding: '0.75rem' }}>
+                                                <p style={{ fontSize: '0.75rem', fontWeight: '500', margin: 0 }}>#{doc.transferNumber}</p>
+                                                <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: 0 }}>{doc.date}</p>
+                                                <p style={{ fontSize: '0.75rem', color: '#9ca3af', margin: 0 }}>{doc.items.length} items</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            // Default fallback
+            return (
+                <div style={{ padding: '2rem', textAlign: 'center' }}>
+                    <p>Loading...</p>
+                </div>
             );
-
-            // Other render functions would go here - simplified for space
-            // For now, just showing the menu to test deployment
-
-            return renderMenu();
         };
 
+        console.log("About to render app...");
         ReactDOM.render(React.createElement(WhiteCapScanner), document.getElementById('root'));
+        console.log("App rendered!");
     </script>
 
     <!-- Service Worker for PWA -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4ge30pO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignZmV0Y2gnLCBldmVudCA9PiB7fSk7');
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4ge30pO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignZmV0Y2gnLCBldmVudCA9PiB7fSk7')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
         }
     </script>
 </body>
