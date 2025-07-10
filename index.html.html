@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Cap Scanner</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiV2hpdGUgQ2FwIFNjYW5uZXIiLCJzaG9ydF9uYW1lIjoiV0MgU2Nhbm5lciIsImRlc2NyaXB0aW9uIjoiQUktcG93ZXJlZCBkb2N1bWVudCBzY2FubmluZyBmb3IgV2hpdGUgQ2FwIHBhY2tpbmcgc2xpcHMiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTWpRaUlHaGxhV2RvZEQwaU1qUWlJSFpwWlhkQ2IzZzlJakFnTUNBeU5DQXlOQ0lnWm1sc2JEMGlZblZ5YkdGamF5Z3dMREIzTERBeUxERTBMakV0TVRZdU1sTXhOeTQxTFRReU1qQXNOell1T1RrNExURXhMakVzTVRNdU5EUlRNVFl1TlMweU1EQXNOellnTVRNeU5DMGlJSE4wY205clpUMGlJMlptWmlJZ2MzUnliMnRsTFhkcFpIUm9QU0l5SWlBK1BDOXpkbWMrIiwic2l6ZXMiOiIyNHgyNCIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dLCJzdGFydF91cmwiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYifQ==">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="WC Scanner">
+    
+    <style>
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+        const { Camera, FileText, List, Upload, ChevronLeft, Trash2, Eye, Download } = lucideReact;
+
+        const WhiteCapScanner = () => {
+            const [currentView, setCurrentView] = useState('menu');
+            const [scannedDocuments, setScannedDocuments] = useState([]);
+            const [capturedImage, setCapturedImage] = useState(null);
+            const [extractedData, setExtractedData] = useState(null);
+            const [isProcessing, setIsProcessing] = useState(false);
+            const [ocrProgress, setOcrProgress] = useState(0);
+            const [installPrompt, setInstallPrompt] = useState(null);
+            const [showInstallBanner, setShowInstallBanner] = useState(false);
+            const videoRef = useRef(null);
+            const canvasRef = useRef(null);
+            const fileInputRef = useRef(null);
+
+            // PWA Install handling
+            useEffect(() => {
+                const handleBeforeInstallPrompt = (e) => {
+                    e.preventDefault();
+                    setInstallPrompt(e);
+                    setShowInstallBanner(true);
+                };
+
+                window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+                
+                // Check if already installed
+                if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+                    setShowInstallBanner(false);
+                }
+                
+                return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            }, []);
+
+            // Load saved documents
+            useEffect(() => {
+                const saved = localStorage.getItem('whitecap-documents');
+                if (saved) {
+                    try {
+                        setScannedDocuments(JSON.parse(saved));
+                    } catch (e) {
+                        console.error('Error loading saved documents:', e);
+                    }
+                }
+            }, []);
+
+            // Save documents
+            useEffect(() => {
+                localStorage.setItem('whitecap-documents', JSON.stringify(scannedDocuments));
+            }, [scannedDocuments]);
+
+            const installApp = async () => {
+                if (installPrompt) {
+                    const result = await installPrompt.prompt();
+                    setInstallPrompt(null);
+                    setShowInstallBanner(false);
+                } else {
+                    // Fallback for iOS
+                    alert('To install:\n1. Tap the Share button\n2. Select "Add to Home Screen"');
+                }
+            };
+
+            const startCamera = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        } 
+                    });
+                    if (videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                    }
+                } catch (err) {
+                    console.error('Error accessing camera:', err);
+                    alert('Camera access denied. Please use file upload instead.');
+                }
+            };
+
+            const stopCamera = () => {
+                if (videoRef.current && videoRef.current.srcObject) {
+                    const tracks = videoRef.current.srcObject.getTracks();
+                    tracks.forEach(track => track.stop());
+                }
+            };
+
+            const capturePhoto = () => {
+                const canvas = canvasRef.current;
+                const video = videoRef.current;
+                const context = canvas.getContext('2d');
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0);
+                
+                const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                setCapturedImage(imageData);
+                stopCamera();
+                setCurrentView('preview');
+            };
+
+            const handleFileUpload = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        setCapturedImage(e.target.result);
+                        setCurrentView('preview');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            // OCR function using Tesseract.js
+            const extractDataFromImage = async (imageData) => {
+                setIsProcessing(true);
+                setOcrProgress(0);
+
+                try {
+                    // Import Tesseract.js
+                    if (!window.Tesseract) {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
+                        document.head.appendChild(script);
+                        
+                        await new Promise((resolve) => {
+                            script.onload = resolve;
+                        });
+                    }
+
+                    const worker = await Tesseract.createWorker('eng', 1, {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                setOcrProgress(Math.round(m.progress * 100));
+                            }
+                        }
+                    });
+
+                    const { data: { text } } = await worker.recognize(imageData);
+                    await worker.terminate();
+
+                    const extractedData = parseWhiteCapDocument(text);
+                    setExtractedData(extractedData);
+                    
+                } catch (error) {
+                    console.error('OCR Error:', error);
+                    alert('Error processing document. Please try again.');
+                } finally {
+                    setIsProcessing(false);
+                    setOcrProgress(0);
+                }
+            };
+
+            const parseWhiteCapDocument = (text) => {
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                
+                let requestDate = '';
+                let transferNumber = '';
+                let items = [];
+
+                // Extract request date
+                const dateRegex = /(\d{2}\/\d{2}\/\d{2,4})/g;
+                const dateMatches = text.match(dateRegex);
+                if (dateMatches && dateMatches.length > 0) {
+                    requestDate = dateMatches[0];
+                }
+
+                // Extract transfer number
+                const transferRegex = /(\d{7}-\d{2})/g;
+                const transferMatches = text.match(transferRegex);
+                if (transferMatches && transferMatches.length > 0) {
+                    transferNumber = transferMatches[0];
+                }
+
+                // Extract items
+                const productKeywords = ['PAINT', 'MARKING', 'AEROSOL', 'IC PL', 'INV AER', 'FLUOR', 'CLR', 'CHAIR', 'ROPE', 'CHISEL', 'CONT HIGH'];
+                
+                lines.forEach(line => {
+                    const upperLine = line.toUpperCase();
+                    if (productKeywords.some(keyword => upperLine.includes(keyword))) {
+                        const cleanLine = line.replace(/^\d+\s*/, '').trim();
+                        if (cleanLine.length > 10 && !items.includes(cleanLine)) {
+                            items.push(cleanLine);
+                        }
+                    }
+                });
+
+                if (items.length === 0) {
+                    const potentialItems = lines.filter(line => 
+                        line.length > 15 && 
+                        /^[A-Z\s\d\/\-]+$/i.test(line) &&
+                        !line.includes('WHITE CAP') &&
+                        !line.includes('PACKING') &&
+                        !line.includes('ORDER') &&
+                        !line.includes('SHIP')
+                    );
+                    items = potentialItems.slice(0, 10);
+                }
+
+                const confidence = calculateConfidence(requestDate, transferNumber, items);
+
+                return {
+                    requestDate: requestDate || 'Not found',
+                    transferNumber: transferNumber || 'Not found',
+                    items: items.length > 0 ? items : ['No items detected'],
+                    rawText: text,
+                    confidence: confidence
+                };
+            };
+
+            const calculateConfidence = (requestDate, transferNumber, items) => {
+                let score = 0;
+                if (requestDate !== 'Not found') score += 30;
+                if (transferNumber !== 'Not found') score += 40;
+                if (items.length > 0 && items[0] !== 'No items detected') score += 30;
+                return score;
+            };
+
+            const saveDocument = () => {
+                if (extractedData) {
+                    const newDoc = {
+                        id: Date.now(),
+                        date: new Date().toLocaleDateString(),
+                        image: capturedImage,
+                        ...extractedData
+                    };
+                    setScannedDocuments(prev => [newDoc, ...prev]);
+                    setCurrentView('menu');
+                    setCapturedImage(null);
+                    setExtractedData(null);
+                }
+            };
+
+            const deleteDocument = (id) => {
+                setScannedDocuments(prev => prev.filter(doc => doc.id !== id));
+            };
+
+            const exportData = () => {
+                const dataStr = JSON.stringify(scannedDocuments, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `whitecap-data-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const renderMenu = () => (
+                React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4" },
+                    React.createElement('div', { className: "max-w-md mx-auto" },
+                        showInstallBanner && React.createElement('div', { className: "bg-blue-600 text-white p-4 rounded-xl mb-4 flex items-center justify-between" },
+                            React.createElement('div', null,
+                                React.createElement('p', { className: "font-semibold" }, "Install App"),
+                                React.createElement('p', { className: "text-sm opacity-90" }, "Add to home screen for easy access")
+                            ),
+                            React.createElement('button', { 
+                                onClick: installApp,
+                                className: "bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold"
+                            }, "Install")
+                        ),
+                        React.createElement('div', { className: "text-center mb-8 pt-8" },
+                            React.createElement('div', { className: "w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4" },
+                                React.createElement(FileText, { className: "w-8 h-8 text-white" })
+                            ),
+                            React.createElement('h1', { className: "text-2xl font-bold text-gray-800" }, "White Cap Scanner"),
+                            React.createElement('p', { className: "text-gray-600 mt-2" }, "AI-powered document scanning")
+                        ),
+                        React.createElement('div', { className: "space-y-4" },
+                            React.createElement('button', {
+                                onClick: () => setCurrentView('scan'),
+                                className: "w-full bg-blue-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-blue-700 transition-colors"
+                            },
+                                React.createElement(Camera, { className: "w-6 h-6" }),
+                                React.createElement('span', { className: "text-lg font-semibold" }, "Scan Document")
+                            ),
+                            React.createElement('button', {
+                                onClick: () => setCurrentView('records'),
+                                className: "w-full bg-green-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-green-700 transition-colors"
+                            },
+                                React.createElement(List, { className: "w-6 h-6" }),
+                                React.createElement('span', { className: "text-lg font-semibold" }, `View Records (${scannedDocuments.length})`)
+                            ),
+                            React.createElement('button', {
+                                onClick: () => setCurrentView('uploads'),
+                                className: "w-full bg-purple-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-purple-700 transition-colors"
+                            },
+                                React.createElement(Upload, { className: "w-6 h-6" }),
+                                React.createElement('span', { className: "text-lg font-semibold" }, "All Uploads")
+                            ),
+                            scannedDocuments.length > 0 && React.createElement('button', {
+                                onClick: exportData,
+                                className: "w-full bg-gray-600 text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-lg hover:bg-gray-700 transition-colors"
+                            },
+                                React.createElement(Download, { className: "w-6 h-6" }),
+                                React.createElement('span', { className: "text-lg font-semibold" }, "Export Data")
+                            )
+                        ),
+                        React.createElement('div', { className: "mt-8 text-center text-sm text-gray-500" },
+                            React.createElement('p', null, "Powered by Tesseract.js OCR")
+                        )
+                    )
+                )
+            );
+
+            // Other render functions would go here - simplified for space
+            // For now, just showing the menu to test deployment
+
+            return renderMenu();
+        };
+
+        ReactDOM.render(React.createElement(WhiteCapScanner), document.getElementById('root'));
+    </script>
+
+    <!-- Service Worker for PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4ge30pO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignZmV0Y2gnLCBldmVudCA9PiB7fSk7');
+        }
+    </script>
+</body>
+</html>
